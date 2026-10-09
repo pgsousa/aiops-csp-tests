@@ -1,77 +1,61 @@
-{
-  "apiVersion": "apps/v1",
-  "kind": "Deployment",
-  "metadata": {
-    "name": "oom-target",
-    "labels": {
-      "app": "oom-target",
-      "aiopscsp.test/run": "aiopscsp-live-20261007-170851",
-      "aiopscsp.test/owner": "aiopscsp-live-20261007-170851"
-    },
-    "namespace": "aiopscsp-e2e-argocd-aiopscsp-live-20261007-170851"
-  },
-  "spec": {
-    "replicas": 1,
-    "selector": {
-      "matchLabels": {
-        "app": "oom-target",
-        "aiopscsp.test/run": "aiopscsp-live-20261007-170851",
-        "aiopscsp.test/owner": "aiopscsp-live-20261007-170851"
-      }
-    },
-    "template": {
-      "metadata": {
-        "labels": {
-          "app": "oom-target",
-          "aiopscsp.test/run": "aiopscsp-live-20261007-170851",
-          "aiopscsp.test/owner": "aiopscsp-live-20261007-170851"
-        },
-        "annotations": {
-          "aiopscsp.test/mutation": "TEST_DRIVER_SETUP"
-        }
-      },
-      "spec": {
-        "automountServiceAccountToken": false,
-        "securityContext": {
-          "runAsNonRoot": true,
-          "runAsUser": 65532,
-          "seccompProfile": {
-            "type": "RuntimeDefault"
-          }
-        },
-        "containers": [
-          {
-            "name": "oom-target",
-            "image": "docker.io/library/python@sha256:2055081c860db8c842b663415b795b026e7e5cc63b59c5193fcc9997713ea5b8",
-            "command": [
-              "python",
-              "-c",
-              "import time\npayload = bytearray(64 * 1024 * 1024)\nfor offset in range(0, len(payload), 4096): payload[offset] = 1\ntime.sleep(300)\n"
-            ],
-            "resources": {
-              "requests": {
-                "memory": "16Mi",
-                "cpu": "10m"
-              },
-              "limits": {
-                "memory": "32Mi",
-                "cpu": "100m"
-              }
-            },
-            "securityContext": {
-              "allowPrivilegeEscalation": false,
-              "capabilities": {
-                "drop": [
-                  "ALL"
-                ]
-              },
-              "readOnlyRootFilesystem": true,
-              "runAsNonRoot": true,
-              "runAsUser": 65532
-            }
-          }
-        ]
-      }
-    }
-  }
-}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oom-target-a01-retry2
+  labels:
+    app: oom-target-a01-retry2
+    aiopscsp.test/run: aiopscsp-live-20261007-170851
+    aiopscsp.test/owner: aiopscsp-live-20261007-170851
+  namespace: aiopscsp-e2e-argocd-aiopscsp-live-20261007-170851
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oom-target-a01-retry2
+      aiopscsp.test/run: aiopscsp-live-20261007-170851
+      aiopscsp.test/owner: aiopscsp-live-20261007-170851
+  template:
+    metadata:
+      labels:
+        app: oom-target-a01-retry2
+        aiopscsp.test/run: aiopscsp-live-20261007-170851
+        aiopscsp.test/owner: aiopscsp-live-20261007-170851
+      annotations:
+        aiopscsp.test/mutation: TEST_DRIVER_SETUP
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: oom-target
+        image: docker.io/library/python@sha256:2055081c860db8c842b663415b795b026e7e5cc63b59c5193fcc9997713ea5b8
+        command:
+        - python
+        - -c
+        - 'import time
+
+          payload = bytearray(64 * 1024 * 1024)
+
+          for offset in range(0, len(payload), 4096): payload[offset] = 1
+
+          time.sleep(300)
+
+          '
+        resources:
+          requests:
+            memory: 16Mi
+            cpu: 10m
+          limits:
+            memory: 32Mi
+            cpu: 100m
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
