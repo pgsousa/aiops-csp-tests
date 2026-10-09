@@ -1,0 +1,73 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "labels": {
+      "aiopscsp.test/owner": "aiopscsp-live-20261009-215336",
+      "aiopscsp.test/run": "aiopscsp-live-20261009-215336",
+      "app": "oom-target"
+    },
+    "name": "oom-target"
+  },
+  "spec": {
+    "replicas": 1,
+    "selector": {
+      "matchLabels": {
+        "aiopscsp.test/owner": "aiopscsp-live-20261009-215336",
+        "aiopscsp.test/run": "aiopscsp-live-20261009-215336",
+        "app": "oom-target"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "aiopscsp.test/owner": "aiopscsp-live-20261009-215336",
+          "aiopscsp.test/run": "aiopscsp-live-20261009-215336",
+          "app": "oom-target"
+        }
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "command": [
+              "python",
+              "-c",
+              "import time\npayload=bytearray(36*1024*1024)\nfor i in range(0,len(payload),4096): payload[i]=1\ntime.sleep(300)\n"
+            ],
+            "image": "docker.io/library/python@sha256:2055081c860db8c842b663415b795b026e7e5cc63b59c5193fcc9997713ea5b8",
+            "name": "oom-target",
+            "resources": {
+              "limits": {
+                "cpu": "100m",
+                "memory": "32Mi"
+              },
+              "requests": {
+                "cpu": "10m",
+                "memory": "16Mi"
+              }
+            },
+            "securityContext": {
+              "allowPrivilegeEscalation": false,
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              },
+              "readOnlyRootFilesystem": true,
+              "runAsNonRoot": true,
+              "runAsUser": 65532
+            }
+          }
+        ],
+        "securityContext": {
+          "runAsNonRoot": true,
+          "runAsUser": 65532,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        }
+      }
+    }
+  }
+}
