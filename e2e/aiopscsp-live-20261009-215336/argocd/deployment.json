@@ -18,6 +18,9 @@
         "app": "oom-target"
       }
     },
+    "strategy": {
+      "type": "Recreate"
+    },
     "template": {
       "metadata": {
         "labels": {
@@ -33,10 +36,20 @@
             "command": [
               "python",
               "-c",
-              "import time\npayload=bytearray(36*1024*1024)\nfor i in range(0,len(payload),4096): payload[i]=1\ntime.sleep(300)\n"
+              "import socket,time\ntime.sleep(300)\npayload=bytearray(36*1024*1024)\nfor i in range(0,len(payload),4096): payload[i]=1\nserver=socket.socket(socket.AF_INET,socket.SOCK_STREAM)\nserver.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)\nserver.bind(('0.0.0.0',8080))\nserver.listen(8)\nwhile True:\n client,_=server.accept()\n client.close()\n"
             ],
             "image": "docker.io/library/python@sha256:2055081c860db8c842b663415b795b026e7e5cc63b59c5193fcc9997713ea5b8",
             "name": "oom-target",
+            "readinessProbe": {
+              "failureThreshold": 2,
+              "initialDelaySeconds": 1,
+              "periodSeconds": 5,
+              "successThreshold": 1,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 1
+            },
             "resources": {
               "limits": {
                 "cpu": "100m",
