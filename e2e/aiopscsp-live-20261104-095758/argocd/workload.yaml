@@ -1,4 +1,3 @@
-# Intentionally broken: the container allocates 64 MiB under a 64Mi limit.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,10 +5,8 @@ metadata:
   namespace: aiopscsp-e2e-argocd-aiopscsp-live-20261104-095758
   labels: &id001
     app.kubernetes.io/name: oom-target
-    aiopscsp.test/owner: aiopscsp-live-20261104-095758
-    aiopscsp.test/scenario: t01-oom
-  annotations:
-    aiopscsp.test/effect-class: TEST_DRIVER_SETUP
+    app.kubernetes.io/component: cache-warmer
+    app.kubernetes.io/part-of: report-service
 spec:
   replicas: 1
   revisionHistoryLimit: 2
@@ -36,12 +33,12 @@ spec:
         command:
         - node
         - -e
-        - "\"use strict\";\nconsole.log(\"Bounded memory fixture started\");\nconst\
+        - "\"use strict\";\nconsole.log(\"Report cache warm-up started\");\nconst\
           \ blocks = [];\nconst targetBlocks = 8;\nfunction allocate() {\n  const\
           \ block = Buffer.alloc(8 * 1024 * 1024);\n  for (let offset = 0; offset\
           \ < block.length; offset += 4096) {\n    block[offset] = 165;\n  }\n  blocks.push(block);\n\
           \  if (blocks.length < targetBlocks) {\n    setTimeout(allocate, 250);\n\
-          \  } else {\n    console.log(\"Bounded memory fixture allocation complete\"\
+          \  } else {\n    console.log(\"Report cache loaded\"\
           );\n    setInterval(() => {\n      if (blocks.length !== targetBlocks ||\
           \ blocks.some(value => value[0] !== 165)) {\n        process.exitCode =\
           \ 1;\n      }\n    }, 1000);\n  }\n}\nsetTimeout(allocate, 120000);\n"
