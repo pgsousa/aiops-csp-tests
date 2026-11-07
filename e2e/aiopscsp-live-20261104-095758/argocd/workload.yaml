@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -38,17 +39,17 @@ spec:
           \ block = Buffer.alloc(8 * 1024 * 1024);\n  for (let offset = 0; offset\
           \ < block.length; offset += 4096) {\n    block[offset] = 165;\n  }\n  blocks.push(block);\n\
           \  if (blocks.length < targetBlocks) {\n    setTimeout(allocate, 250);\n\
-          \  } else {\n    console.log(\"Report cache loaded\"\
-          );\n    setInterval(() => {\n      if (blocks.length !== targetBlocks ||\
-          \ blocks.some(value => value[0] !== 165)) {\n        process.exitCode =\
-          \ 1;\n      }\n    }, 1000);\n  }\n}\nsetTimeout(allocate, 120000);\n"
+          \  } else {\n    console.log(\"Report cache loaded\");\n    setInterval(()\
+          \ => {\n      if (blocks.length !== targetBlocks || blocks.some(value =>\
+          \ value[0] !== 165)) {\n        process.exitCode = 1;\n      }\n    }, 1000);\n\
+          \  }\n}\nsetTimeout(allocate, 120000);\n"
         resources:
           requests:
             cpu: 25m
-            memory: 32Mi
+            memory: 128Mi
           limits:
             cpu: 100m
-            memory: 64Mi
+            memory: 192Mi
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
